@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>添加用户</title>
+    <script src="../js/vue.js" type="text/javascript" charset="utf-8"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"> 
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script> 
+	<style>
+	        html, body {
+	            height: 100%;
+	            margin: 0;
+	            padding: 0;
+	            display: flex;
+	            justify-content: center;
+	            align-items: center;
+	        }
+	    </style>
+</head>
+<body>
+
+
+<div id="app">
+    <el-container>
+        <el-main>
+            <el-card class="register-container" shadow="hover" style="width: 400px; margin: 0 auto;">
+                <h1 slot="header" style="text-align: center;">添加用户</h1>
+                <el-form class="register-form" :model="formData" ref="formData" label-width="80px">
+                    <el-form-item label="账号" prop="usernum">
+                        <el-input v-model="formData.usernum" placeholder="请输入账号"></el-input>
+                    </el-form-item>
+                    <el-form-item label="密码" prop="userpwd">
+                        <el-input type="password" v-model="formData.userpwd" placeholder="请输入密码"></el-input>
+                    </el-form-item>
+                    <el-form-item label="姓名" prop="name">
+                        <el-input v-model="formData.name" placeholder="请输入姓名"></el-input>
+                    </el-form-item>
+                    <el-form-item label="身份" prop="role">
+                        <el-select v-model="formData.role" placeholder="请选择身份">
+                            <el-option label="学生" value="student"></el-option>
+                            <el-option label="教师" value="teacher"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" @click="register">添加</el-button>
+                        <el-button @click="back">返回主界面</el-button>
+                    </el-form-item>
+                </el-form>
+            </el-card>
+        </el-main>
+    </el-container>
+</div>
+
+<script src="../js/axios.min.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            formData: {
+                usernum: '',
+                userpwd: '',
+                name: '',
+                role: ''
+            }
+        },
+        methods: {
+            register() {
+                // 表单验证
+				if (!this.formData.usernum || !this.formData.userpwd || !this.formData.name || !this.formData.role) {
+					this.$message({
+					    type: 'error',
+					    message: '请填写所有信息后再点击添加！'
+					 });
+				    
+				    return;
+				}
+  
+                axios.post('http://localhost:9000/user/register', this.formData)
+                    .then(response => {
+						
+						if(response.data.isOk){
+							this.$message({
+							    type: 'success',
+							    message: response.data.msg
+							 });
+						}else{
+							this.$message({
+							    type: 'error',
+							    message: response.data.msg
+							 });
+						}
+                        
+                          
+                          
+                     })
+                            
+                    
+                
+            },
+            back() {
+                window.history.back();
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

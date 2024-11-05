@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>添加课程</title>
+    <script src="../js/vue.js" type="text/javascript" charset="utf-8"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"> 
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script> 
+	<style>
+	        html, body {
+	            height: 100%;
+	            margin: 0;
+	            padding: 0;
+	            display: flex;
+	            justify-content: center;
+	            align-items: center;
+	        }
+	    </style>
+</head>
+<body>
+
+
+<div id="app">
+    <el-container>
+        <el-main>
+            <el-card class="register-container" shadow="hover" style="width: 400px; margin: 0 auto;">
+                <h1 slot="header" style="text-align: center;">添加课程</h1>
+                <el-form class="register-form" :model="formData" ref="formData" label-width="80px">
+                    <el-form-item label="课程名" prop="courseName">
+                        <el-input v-model="formData.courseName" placeholder="请输入课程名"></el-input>
+                    </el-form-item>
+                    <el-form-item label="课程选课上限人数" prop="size">
+                        <el-input v-model="formData.size" placeholder="请输入上限人数"></el-input>
+                    </el-form-item>
+                    <el-form-item label="备注" prop="describe">
+                        <el-input v-model="formData.describe" placeholder="请输入备注"></el-input>
+                    </el-form-item>
+                    
+                    <el-form-item>
+                        <el-button type="primary" @click="addCourse">添加</el-button>
+                        <el-button @click="back">返回主界面</el-button>
+                    </el-form-item>
+                </el-form>
+            </el-card>
+        </el-main>
+    </el-container>
+</div>
+
+<script src="../js/axios.min.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            formData: {
+                courseName: '',
+                size: '',
+                teacherName: '',
+                describe: ''
+            }
+        },
+        methods: {
+            addCourse() {
+				const urlParams = new URLSearchParams(window.location.search);
+				this.formData.teacherName = urlParams.get('teachername');
+				console.log(this.courseId);
+				
+                // 表单验证
+				if (!this.formData.courseName || !this.formData.size || !this.formData.teacherName) {
+					this.$message({
+					    type: 'error',
+					    message: '请填写所有信息后再点击添加！'
+					 });
+				    
+				    return;
+				}
+  
+                axios.post('http://localhost:9000/teacher/addCourse', this.formData,{ withCredentials: true })
+                    .then(response => {
+						
+						if(response.data.isOk){
+							this.$message({
+							    type: 'success',
+							    message: response.data.msg
+							 });
+						}else{
+							this.$message({
+							    type: 'error',
+							    message: response.data.msg
+							 });
+						}
+                        
+                          
+                          
+                     })
+                            
+                    
+                
+            },
+            back() {
+                window.history.back();
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

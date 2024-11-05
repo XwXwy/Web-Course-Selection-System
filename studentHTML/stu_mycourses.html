@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>已选课程列表</title>
+    <!-- 引入Element UI的CSS -->
+    <script src="../js/vue.js" type="text/javascript" charset="utf-8"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"> 
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <style>
+        .center {
+            text-align: center;
+        }
+        .search-container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .search-container .el-input {
+            width: 300px; /* 调整搜索框宽度 */
+            margin-right: 10px; /* 使搜索框和按钮之间保持间距 */
+        }
+        .search-container .el-button {
+            margin-right: 5px; /* 按钮之间的间距 */
+        }
+				
+		
+		#back-button{
+		    position: fixed;
+			
+		    bottom: 30px;
+			left: 50%;
+		}
+    </style>
+</head>
+<body style="margin-bottom: 100px;">
+    <div id="app">
+        <div class="search-container">
+            <el-input v-model="searchQuery" placeholder="输入课程名或教师名搜索"></el-input>
+            <el-button type="primary" @click="searchcourses">搜索</el-button>
+            <el-button type="warning" @click="resetSearch">重置</el-button>
+        </div>
+		
+		
+		<el-button id="back-button" type="primary" @click="back">返回</el-button>
+		
+		
+        <el-table :data="filteredcourses" style="width: 100%">
+            <el-table-column prop="courseId" label="ID"></el-table-column>
+            <el-table-column prop="courseName" label="课程名" ></el-table-column>
+            <el-table-column prop="teacherName" label="教师" ></el-table-column>
+            <el-table-column prop="size" label="选课上限人数" ></el-table-column>
+            <el-table-column prop="now" label="当前选课人数"></el-table-column>
+			<el-table-column prop="describe" label="备注"></el-table-column>
+			<el-table-column label="操作">
+				<template slot-scope="scope">
+				   
+				    <el-button type="danger" @click="dropCourse(scope.row)">退课</el-button>
+				</template>
+			</el-table-column>
+        </el-table>
+		
+
+		
+    </div>
+
+    <script src="../js/axios.min.js"></script>
+    <script type="text/javascript">
+		
+		
+
+		
+        axios.defaults.withCredentials = true;
+        new Vue({
+            el: '#app',
+            data: {
+                courses: [],
+                searchQuery: '',
+                filteredcourses: [],
+				studentName: '',
+				courseName:'',
+				teacherName:''
+            },
+            methods: {
+                loadcourses() {
+					
+                    axios.post('http://localhost:9000/stu/mylist',{
+						
+						    studentName: this.studentName
+						
+					}).then(res => {
+                        if (res.data.isOk) {
+                            this.courses = res.data.courses;
+                            this.filteredcourses = this.courses;
+							this.$message({
+							        message: res.data.msg,
+							        type: 'success'
+							    });
+								
+                        }else{
+							this.$message({
+							        message:'查询失败,用户未登录!',
+							        type: 'error'
+							    });
+						}
+                        
+                    });
+                },
+                searchcourses() {
+                    const query = this.searchQuery.toLowerCase();
+					if(query===''){
+						this.$message.error('请输入搜索关键词！');
+						return;
+					}
+                    this.filteredcourses = this.courses.filter(course => {
+                        return course.courseName.toLowerCase().includes(query) || course.teacherName.toLowerCase().includes(query);
+                    });
+							this.$message.success('搜索成功！');
+                },
+                resetSearch() {
+                    this.searchQuery = '';
+                    this.filteredcourses = this.courses;
+                },
+				
+				back(){
+					window.history.back();
+				},
+				
+				dropCourse(course){
+					
+					axios.post('http://localhost:9000/stu/deleteChoice', {
+					        studentName: this.studentName,
+					        courseId: Number(course.courseId),
+					        teacherName: course.teacherName
+					    }).then(response => {
+					        if (response.data.isOk) {
+					            
+					            this.$message.success(response.data.msg);
+								this.loadcourses();
+					        } else {
+					            this.$message.error(response.data.msg);
+					        }
+					    }).catch(error => {
+					        this.$message.error('退课失败！');
+					    });
+					
+				}
+
+            },
+            created() {
+				axios.get('http://localhost:9000/user/info')
+				  .then(response => {
+				    // 获取用户信息成功，从响应中获取用户名
+				    this.studentName = response.data.name;
+					
+					this.loadcourses();
+				  })
+				  
+                
+            }
+        });
+    </script>
+</body>
+</html>

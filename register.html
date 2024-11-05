@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 - 选课系统</title>
+    <style>
+        body, html {
+        	
+        	
+          margin: 0;
+          padding: 0;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: #f5f5f5;
+          font-family: Arial, sans-serif;
+          font-size: 18px; /* 调整字体大小 */
+          background-image: url('image/background5.jpeg'); /* 设置背景图片路径 */
+          background-size: cover; /* 使背景图片覆盖全屏 */
+          background-position: center; /* 背景图片居中 */
+          background-repeat: no-repeat; /* 背景图片不重复 */
+          background-attachment: fixed;
+        }
+
+        .register-container {
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .register-form {
+            display: inline-block;
+            width: 300px;
+            text-align: left;
+        }
+
+        .register-form input, .register-form select {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .register-form button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        .register-form button:last-child {
+            background-color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div class="register-container">
+        <h1>用户注册</h1>
+        <div class="register-form">
+            <input type="text" v-model="usernum" placeholder="账号" />
+            <input type="password" v-model="userpwd" placeholder="密码" />
+            <input type="text" v-model="name" placeholder="姓名" />
+            <select v-model="role">
+                <option value="" disabled selected>请选择您的身份</option>
+                <option value="student">学生</option>
+                <option value="teacher">教师</option>
+            </select>
+            <button @click="register">注册</button>
+            <button @click="backToLogin">返回登录界面</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/axios.min.js"></script>
+<script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            usernum: '',
+            userpwd: '',
+            name: '',
+            role: ''
+        },
+        methods: {
+            register() {
+				
+				if (!this.usernum || !this.userpwd || !this.name || !this.role) {
+				    alert('请填写所有信息后再点击注册！');
+				    return;
+				}
+				
+				console.log(this.usernum);
+				console.log(this.userpwd);
+                // 发送注册请求
+                axios.post('http://localhost:9000/user/register', {
+                    usernum: this.usernum,
+                    userpwd: this.userpwd,
+                    name: this.name,
+                    role: this.role
+                })
+                .then(response => {
+                    alert(response.data.msg);
+                    console.log('注册成功', response.data.msg);
+                    // 在这里处理注册成功后的逻辑，比如跳转到登录页面
+                })
+                .catch(error => {
+                    alert('注册失败:' + error.response.data.msg);
+                    console.error('注册失败', error.response.data.msg);
+                    // 在这里处理注册失败的逻辑，比如显示错误信息给用户
+                });
+            },
+            backToLogin() {
+                window.location.href = 'http://127.0.0.1:8848/Web2024%20HW/login.html';
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

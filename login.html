@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>选课系统</title>
+  <style>
+    body, html {
+		
+		
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f5f5f5;
+      font-family: Arial, sans-serif;
+      font-size: 18px; /* 调整字体大小 */
+      background-image: url('image/background4.jpeg'); /* 设置背景图片路径 */
+      background-size: cover; /* 使背景图片覆盖全屏 */
+      background-position: center; /* 背景图片居中 */
+      background-repeat: no-repeat; /* 背景图片不重复 */
+      background-attachment: fixed;
+    }
+
+    .login-container {
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .login-form {
+      display: inline-block;
+      width: 300px;
+      text-align: left;
+    }
+
+    .login-form input {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    .login-form button {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 10px;
+      border: none;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+
+    .login-form button:last-child {
+      background-color: #6c757d;
+    }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div class="login-container">
+    <h1>东北大学选课系统</h1>
+	<h2>20226690 孙博文</h2>
+    <div class="login-form">
+      <input type="text" v-model="usernum" placeholder="账号" />
+      <input type="password" v-model="password" placeholder="密码" />
+      <button @click="login">登录</button>
+      <button @click="register">注册</button>
+    </div>
+	
+	
+  </div>
+</div>
+
+<script src="js/axios.min.js"></script>
+<script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+<script>
+  axios.defaults.withCredentials = true;
+  new Vue({
+    el: '#app',
+    data: {
+      usernum: '',
+      password: '',
+	  sessionToken:''
+    },
+    methods: {
+      login() {
+        // 发送登录请求
+        axios.post('http://localhost:9000/user/login', {
+          usernum: this.usernum,
+          password: this.password
+        })
+        .then(response => {
+			if(response.data.isOk){
+				//登录成功
+				if (response.data.role === "admin") {
+					alert(response.data.msg);
+				    location.href = "http://127.0.0.1:8848/Web2024%20HW/adminhtml/adminmain.html";
+				}else if(response.data.role === "student"){
+					alert(response.data.msg);
+					location.href = "http://127.0.0.1:8848/Web2024%20HW/studenthtml/stumain.html";
+				}else if(response.data.role === "teacher"){
+					alert(response.data.msg);
+					location.href = "http://127.0.0.1:8848/Web2024%20HW/teacherhtml/teamain.html";
+				}
+							
+			}else{
+				alert(response.data.msg);	
+			}
+		  
+          // 在这里处理登录成功后的逻辑，比如跳转到其他页面
+        })
+		
+        .catch(error => {
+			alert(response.data.msg);
+            console.error('登录失败', response.data.msg);
+          // 请求失败，返回错误消息
+        });
+		
+      },
+      register() {
+		  
+		 window.location.href = 'http://127.0.0.1:8848/Web2024%20HW/register.html'; 
+		  
+
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
